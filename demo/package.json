@@ -8,16 +8,16 @@
     "ios": "expo start --ios"
   },
   "dependencies": {
-    "@pollar/react-native": "../pollar-react-native-0.9.0.tgz",
+    "@expo/metro-runtime": "~4.0.0",
     "@pollar/core": "^0.9.0",
+    "@pollar/react-native": "../pollar-react-native-0.9.0.tgz",
     "expo": "~56.0.0",
     "expo-secure-store": "~14.0.0",
     "expo-status-bar": "~2.0.0",
     "react": "18.3.1",
+    "react-dom": "^18.3.1",
     "react-native": "0.76.7",
-    "react-dom": "18.3.1",
-    "react-native-web": "~0.19.0",
-    "@expo/metro-runtime": "~4.0.0"
+    "react-native-web": "^0.19.13"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
