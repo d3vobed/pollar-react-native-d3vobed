@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "Pollar RN Demo",
+    "slug": "pollar-rn-demo",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#0560a9"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "xyz.pollar.rndemo"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0560a9"
+      },
+      "package": "xyz.pollar.rndemo"
+    },
+    "plugins": [
+      "expo-secure-store"
+    ]
+  }
+}
