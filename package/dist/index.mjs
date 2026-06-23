@@ -110,7 +110,7 @@ function usePollar() {
 }
 
 // src/EmailLogin.tsx
-import { useState as useState2, useCallback as useCallback2, useEffect as useEffect2 } from "react";
+import { useState as useState2, useCallback as useCallback2, useEffect as useEffect2, useRef } from "react";
 import {
   View,
   Text,
@@ -126,19 +126,27 @@ function EmailLogin({ onSuccess, onError }) {
   const { authState, beginEmailLogin, sendEmailCode, verifyEmailCode, isAuthenticated } = usePollar();
   const [email, setEmail] = useState2("");
   const [code, setCode] = useState2("");
-  const [flowStarted, setFlowStarted] = useState2(false);
-  const handleSendCode = useCallback2(() => {
+  const [sendingCode, setSendingCode] = useState2(false);
+  const pendingEmailRef = useRef("");
+  const handleBeginFlow = useCallback2(() => {
     if (!email.trim()) return;
-    if (!flowStarted) {
-      beginEmailLogin();
-    }
-    sendEmailCode(email.trim());
-    setFlowStarted(true);
-  }, [email, beginEmailLogin, sendEmailCode, flowStarted]);
+    pendingEmailRef.current = email.trim();
+    setSendingCode(true);
+    beginEmailLogin();
+  }, [email, beginEmailLogin]);
   const handleVerifyCode = useCallback2(() => {
     if (!code.trim()) return;
     verifyEmailCode(code.trim());
   }, [code, verifyEmailCode]);
+  useEffect2(() => {
+    if (authState.step === "entering_email" && sendingCode) {
+      const emailToSend = pendingEmailRef.current;
+      if (emailToSend) {
+        sendEmailCode(emailToSend);
+        setSendingCode(false);
+      }
+    }
+  }, [authState, sendingCode, sendEmailCode]);
   useEffect2(() => {
     if (isAuthenticated) {
       onSuccess?.();
@@ -179,7 +187,7 @@ function EmailLogin({ onSuccess, onError }) {
             TouchableOpacity,
             {
               style: [styles.button, (!email.trim() || isLoading) && styles.buttonDisabled],
-              onPress: handleSendCode,
+              onPress: handleBeginFlow,
               disabled: !email.trim() || isLoading,
               children: isLoading ? /* @__PURE__ */ jsx2(ActivityIndicator, { color: "#fff" }) : /* @__PURE__ */ jsx2(Text, { style: styles.buttonText, children: "Send Code" })
             }

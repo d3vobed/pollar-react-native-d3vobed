@@ -146,19 +146,27 @@ function EmailLogin({ onSuccess, onError }) {
   const { authState, beginEmailLogin, sendEmailCode, verifyEmailCode, isAuthenticated } = usePollar();
   const [email, setEmail] = (0, import_react3.useState)("");
   const [code, setCode] = (0, import_react3.useState)("");
-  const [flowStarted, setFlowStarted] = (0, import_react3.useState)(false);
-  const handleSendCode = (0, import_react3.useCallback)(() => {
+  const [sendingCode, setSendingCode] = (0, import_react3.useState)(false);
+  const pendingEmailRef = (0, import_react3.useRef)("");
+  const handleBeginFlow = (0, import_react3.useCallback)(() => {
     if (!email.trim()) return;
-    if (!flowStarted) {
-      beginEmailLogin();
-    }
-    sendEmailCode(email.trim());
-    setFlowStarted(true);
-  }, [email, beginEmailLogin, sendEmailCode, flowStarted]);
+    pendingEmailRef.current = email.trim();
+    setSendingCode(true);
+    beginEmailLogin();
+  }, [email, beginEmailLogin]);
   const handleVerifyCode = (0, import_react3.useCallback)(() => {
     if (!code.trim()) return;
     verifyEmailCode(code.trim());
   }, [code, verifyEmailCode]);
+  (0, import_react3.useEffect)(() => {
+    if (authState.step === "entering_email" && sendingCode) {
+      const emailToSend = pendingEmailRef.current;
+      if (emailToSend) {
+        sendEmailCode(emailToSend);
+        setSendingCode(false);
+      }
+    }
+  }, [authState, sendingCode, sendEmailCode]);
   (0, import_react3.useEffect)(() => {
     if (isAuthenticated) {
       onSuccess?.();
@@ -199,7 +207,7 @@ function EmailLogin({ onSuccess, onError }) {
             import_react_native.TouchableOpacity,
             {
               style: [styles.button, (!email.trim() || isLoading) && styles.buttonDisabled],
-              onPress: handleSendCode,
+              onPress: handleBeginFlow,
               disabled: !email.trim() || isLoading,
               children: isLoading ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(import_react_native.ActivityIndicator, { color: "#fff" }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(import_react_native.Text, { style: styles.buttonText, children: "Send Code" })
             }

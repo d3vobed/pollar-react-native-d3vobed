@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import {
   View,
   Text,
@@ -20,21 +20,30 @@ export function EmailLogin({ onSuccess, onError }: EmailLoginProps) {
   const { authState, beginEmailLogin, sendEmailCode, verifyEmailCode, isAuthenticated } = usePollar()
   const [email, setEmail] = useState('')
   const [code, setCode] = useState('')
-  const [flowStarted, setFlowStarted] = useState(false)
+  const [sendingCode, setSendingCode] = useState(false)
+  const pendingEmailRef = useRef('')
 
-  const handleSendCode = useCallback(() => {
+  const handleBeginFlow = useCallback(() => {
     if (!email.trim()) return
-    if (!flowStarted) {
-      beginEmailLogin()
-    }
-    sendEmailCode(email.trim())
-    setFlowStarted(true)
-  }, [email, beginEmailLogin, sendEmailCode, flowStarted])
+    pendingEmailRef.current = email.trim()
+    setSendingCode(true)
+    beginEmailLogin()
+  }, [email, beginEmailLogin])
 
   const handleVerifyCode = useCallback(() => {
     if (!code.trim()) return
     verifyEmailCode(code.trim())
   }, [code, verifyEmailCode])
+
+  useEffect(() => {
+    if (authState.step === 'entering_email' && sendingCode) {
+      const emailToSend = pendingEmailRef.current
+      if (emailToSend) {
+        sendEmailCode(emailToSend)
+        setSendingCode(false)
+      }
+    }
+  }, [authState, sendingCode, sendEmailCode])
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -85,7 +94,7 @@ export function EmailLogin({ onSuccess, onError }: EmailLoginProps) {
             />
             <TouchableOpacity
               style={[styles.button, (!email.trim() || isLoading) && styles.buttonDisabled]}
-              onPress={handleSendCode}
+              onPress={handleBeginFlow}
               disabled={!email.trim() || isLoading}
             >
               {isLoading ? (
