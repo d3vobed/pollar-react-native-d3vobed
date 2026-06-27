@@ -4,7 +4,7 @@ import { StatusBar as ExpoStatusBar } from 'expo-status-bar'
 import { PollarProvider, usePollar, EmailLogin } from '@pollar/react-native'
 import { createSecureStoreAdapter } from '@pollar/core/adapters/expo'
 
-const PUBLISHABLE_KEY = 'pat_047619d453971851f2d58d54e68f988c01e4f501dbda240cc1f6d1eb39385eec'
+const PUBLISHABLE_KEY = 'pub_testnet_b09731e77d533adc178ef41756142efc'
 
 function WalletDashboard() {
   const {
